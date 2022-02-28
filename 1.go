@@ -95,6 +95,11 @@ func main() {
 					if listenErr == nil {
 						continue
 					}
+					isRunning := sserver.GetRunState()
+					StartButton.SetEnabled(!isRunning)
+					StopButton.SetEnabled(isRunning)
+					validatorLineEdit.SetEnabled(!isRunning)
+
 					infoLineEdit.SetText(fmt.Sprintf("Listen err[%d]: %v", idx, listenErr))
 				}
 
