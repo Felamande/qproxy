@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/Felamande/go-socks5"
 	"github.com/Felamande/qproxy/socks5server"
@@ -70,26 +71,33 @@ func main() {
 	StartButton.ConnectClicked(func(bool) {
 
 		sserver.Start(validatorLineEdit.Text())
-		go func() {
-			infoLineEdit.SetText("start: " + validatorLineEdit.Text())
-			isRunning := sserver.GetRunState()
-			StartButton.SetEnabled(!isRunning)
-			StopButton.SetEnabled(isRunning)
-			validatorLineEdit.SetEnabled(!isRunning)
+		infoLineEdit.SetText("start: " + validatorLineEdit.Text())
+		isRunning := sserver.GetRunState()
+		StartButton.SetEnabled(!isRunning)
+		StopButton.SetEnabled(isRunning)
+		validatorLineEdit.SetEnabled(!isRunning)
 
-			errs := sserver.GetAllError(3)
-			for _, err := range errs {
-				switch errListenErr := err.(type) {
-				case socks5.ListenError:
-					infoLineEdit.SetText(fmt.Sprintf("Listen err: %v", errListenErr))
-					isRunning := sserver.GetRunState()
-					StartButton.SetEnabled(isRunning)
-					StopButton.SetEnabled(!isRunning)
-					validatorLineEdit.SetEnabled(isRunning)
-					return
-				default:
-					// infoLineEdit.SetText(fmt.Sprintf("get other error: %v", errListenErr))
+		go func() {
+			// defer func() {
+			// 	e := recover()
+			// 	if e != nil {
+			// 		infoLineEdit.SetText(fmt.Sprintf("%v", e))
+			// 	}
+			// }()
+
+			errs := sserver.GetErrorOfType(socks5.ListenError{}, 3*time.Second)
+			if len(errs) != 0 {
+				isRunning := sserver.GetRunState()
+				StartButton.SetEnabled(!isRunning)
+				StopButton.SetEnabled(isRunning)
+				validatorLineEdit.SetEnabled(!isRunning)
+				for idx, listenErr := range errs {
+					if listenErr == nil {
+						continue
+					}
+					infoLineEdit.SetText(fmt.Sprintf("Listen err[%d]: %v", idx, listenErr))
 				}
+
 			}
 		}()
 
@@ -97,10 +105,10 @@ func main() {
 	StopButton.ConnectClicked(func(bool) {
 		sserver.Stop()
 		isRunning := sserver.GetRunState()
-		StartButton.SetEnabled(isRunning)
-		StopButton.SetEnabled(!isRunning)
-		validatorLineEdit.SetEnabled(isRunning)
-		infoLineEdit.SetText("stop: " + validatorLineEdit.Text())
+		StartButton.SetEnabled(!isRunning)
+		StopButton.SetEnabled(isRunning)
+		validatorLineEdit.SetEnabled(!isRunning)
+		infoLineEdit.SetText(fmt.Sprintf("stop[%v]: %v", isRunning, validatorLineEdit.Text()))
 	})
 
 	var validatorLayout = widgets.NewQGridLayout2()

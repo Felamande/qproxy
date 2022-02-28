@@ -2,6 +2,7 @@ package socks5server
 
 import (
 	"context"
+	"reflect"
 	"sync"
 	"time"
 
@@ -27,6 +28,7 @@ func NewSocks5Server() *Socks5Server {
 func (s *Socks5Server) Stop() bool {
 	if s.cancelFn != nil {
 		s.cancelFn()
+		s.changeState(false)
 		return true
 	}
 	return false
@@ -53,14 +55,29 @@ func (s *Socks5Server) Start(port string) error {
 	return nil
 }
 
-func (s *Socks5Server) GetAllError(sec int64) []interface{} {
-	items, _ := s.errQ.Poll(16, time.Second*time.Duration(sec))
+func (s *Socks5Server) GetAllError(timeout time.Duration) []interface{} {
+	items, _ := s.errQ.Poll(16, timeout)
 	return items
 }
 
 func (s *Socks5Server) PeekError() interface{} {
 	items, _ := s.errQ.Peek()
 	return items
+}
+
+func (s *Socks5Server) GetErrorOfType(typ interface{}, timeout time.Duration) []interface{} {
+	retErrs := make([]interface{}, 4)
+	expectType := reflect.TypeOf(typ)
+	errs := s.GetAllError(timeout)
+	for _, err := range errs {
+		switch reflect.TypeOf(err) {
+		case expectType:
+			retErrs = append(retErrs, err)
+		default:
+			s.errQ.Put(err)
+		}
+	}
+	return retErrs
 }
 
 func (s *Socks5Server) changeState(isRunning bool) {
