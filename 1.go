@@ -68,41 +68,38 @@ func main() {
 	// infoLineEdit.SetEnabled(false)
 
 	StartButton.ConnectClicked(func(bool) {
+
 		sserver.Start(validatorLineEdit.Text())
 		go func() {
 			infoLineEdit.SetText("start: " + validatorLineEdit.Text())
-			// StartButton.SetEnabled(false)
-			StartButton.SetEnabled(false)
-			StopButton.SetEnabled(true)
-			validatorLineEdit.SetEnabled(false)
+			isRunning := sserver.GetRunState()
+			StartButton.SetEnabled(!isRunning)
+			StopButton.SetEnabled(isRunning)
+			validatorLineEdit.SetEnabled(!isRunning)
 
 			errs := sserver.GetAllError(3)
 			for _, err := range errs {
 				switch errListenErr := err.(type) {
 				case socks5.ListenError:
 					infoLineEdit.SetText(fmt.Sprintf("Listen err: %v", errListenErr))
-					StartButton.SetEnabled(true)
-					StopButton.SetEnabled(false)
-					validatorLineEdit.SetEnabled(true)
+					isRunning := sserver.GetRunState()
+					StartButton.SetEnabled(isRunning)
+					StopButton.SetEnabled(!isRunning)
+					validatorLineEdit.SetEnabled(isRunning)
 					return
 				default:
-					infoLineEdit.SetText(fmt.Sprintf("get other error: %v", errListenErr))
+					// infoLineEdit.SetText(fmt.Sprintf("get other error: %v", errListenErr))
 				}
-
 			}
-
-			StartButton.SetEnabled(false)
-			StopButton.SetEnabled(true)
-			validatorLineEdit.SetEnabled(false)
-
 		}()
 
 	})
 	StopButton.ConnectClicked(func(bool) {
 		sserver.Stop()
-		StartButton.SetEnabled(true)
-		StopButton.SetEnabled(false)
-		validatorLineEdit.SetEnabled(true)
+		isRunning := sserver.GetRunState()
+		StartButton.SetEnabled(isRunning)
+		StopButton.SetEnabled(!isRunning)
+		validatorLineEdit.SetEnabled(isRunning)
 		infoLineEdit.SetText("stop: " + validatorLineEdit.Text())
 	})
 
