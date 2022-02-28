@@ -126,6 +126,7 @@ func main() {
 	})
 	closeWinAction.ConnectTriggered(func(bool) {
 		gui.QGuiApplication_SetQuitOnLastWindowClosed(true)
+		sysTray.Hide()
 		app.Quit()
 	})
 	sysTray.SetContextMenu(systrayMenu)
