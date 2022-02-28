@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime"
+	"strings"
 	"time"
 
 	"github.com/Felamande/go-socks5"
@@ -11,6 +13,24 @@ import (
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
+
+var verTag string
+var verCommitHash string
+
+// func init() {
+// 	cmdTag := exec.Command("git", "describe", "--abbrev=0", "--tags")
+// 	outTag, err := cmdTag.Output()
+// 	if err == nil {
+// 		verTag = string(outTag)
+// 	}
+
+// 	cmdHash := exec.Command("git", "log", "-1", `--format="%H"`)
+// 	outHash, err := cmdHash.Output()
+// 	if err == nil {
+// 		verCommitHash = string(outHash)
+// 	}
+
+// }
 
 type HideWindow struct {
 	widgets.QMainWindow
@@ -34,12 +54,13 @@ func main() {
 	sserver := socks5server.NewSocks5Server()
 
 	var (
-		validatorGroup    = widgets.NewQGroupBox2("socks5代理", nil)
+		validatorGroup    = widgets.NewQGroupBox2("socks5代理服务器", nil)
 		validatorLabel    = widgets.NewQLabel2("端口:", nil, 0)
 		validatorLineEdit = widgets.NewQLineEdit(nil)
 		StartButton       = widgets.NewQPushButton(nil)
 		StopButton        = widgets.NewQPushButton(nil)
 		infoLineEdit      = widgets.NewQLineEdit(nil)
+		aboutButton       = widgets.NewQPushButton(nil)
 
 		sysTray = widgets.NewQSystemTrayIcon(nil)
 	)
@@ -57,8 +78,12 @@ func main() {
 
 	StartButton.SetSizePolicy(expandSizePol)
 	StopButton.SetSizePolicy(expandSizePol)
+	aboutButton.SetSizePolicy(expandSizePol)
+
 	StartButton.SetText("开始")
 	StopButton.SetText("结束")
+	aboutButton.SetText("关于")
+
 	StopButton.SetEnabled(false)
 	infoLineEdit.SetReadOnly(true)
 
@@ -116,12 +141,17 @@ func main() {
 		infoLineEdit.SetText(fmt.Sprintf("stop[%v]: %v", isRunning, validatorLineEdit.Text()))
 	})
 
+	aboutButton.ConnectClicked(func(checked bool) {
+		widgets.QMessageBox_About(nil, "about qproxy", fmt.Sprintf("qproxy %s(%s)\nQt %s\n%s", verTag, verCommitHash, core.QtGlobal_qVersion(), strings.Replace(runtime.Version(), "go", "Go", -1)))
+	})
+
 	var validatorLayout = widgets.NewQGridLayout2()
 	validatorLayout.AddWidget2(validatorLabel, 0, 0, 0)
 	validatorLayout.AddWidget2(validatorLineEdit, 0, 1, 0)
 	validatorLayout.AddWidget2(StartButton, 1, 0, 0)
 	validatorLayout.AddWidget2(StopButton, 1, 1, 0)
 	validatorLayout.AddWidget2(infoLineEdit, 2, 0, 0)
+	validatorLayout.AddWidget2(aboutButton, 2, 1, 0)
 	validatorGroup.SetLayout(validatorLayout)
 
 	var layout = widgets.NewQGridLayout2()
