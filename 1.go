@@ -17,21 +17,6 @@ import (
 var verTag string
 var verCommitHash string
 
-// func init() {
-// 	cmdTag := exec.Command("git", "describe", "--abbrev=0", "--tags")
-// 	outTag, err := cmdTag.Output()
-// 	if err == nil {
-// 		verTag = string(outTag)
-// 	}
-
-// 	cmdHash := exec.Command("git", "log", "-1", `--format="%H"`)
-// 	outHash, err := cmdHash.Output()
-// 	if err == nil {
-// 		verCommitHash = string(outHash)
-// 	}
-
-// }
-
 type HideWindow struct {
 	widgets.QMainWindow
 }
@@ -103,13 +88,6 @@ func main() {
 		validatorLineEdit.SetEnabled(!isRunning)
 
 		go func() {
-			// defer func() {
-			// 	e := recover()
-			// 	if e != nil {
-			// 		infoLineEdit.SetText(fmt.Sprintf("%v", e))
-			// 	}
-			// }()
-
 			errs := sserver.GetErrorOfType(socks5.ListenError{}, 3*time.Second)
 			if len(errs) != 0 {
 				isRunning := sserver.GetRunState()
