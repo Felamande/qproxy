@@ -76,7 +76,6 @@ func main() {
 	validatorLineEdit.SetText("33899")
 
 	infoLineEdit.SetSizePolicy(expandSizePol)
-	// infoLineEdit.SetEnabled(false)
 
 	StartButton.ConnectClicked(func(bool) {
 
