@@ -6,7 +6,6 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/Felamande/go-socks5"
 	"github.com/Felamande/qproxy/socks5server"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
@@ -23,11 +22,12 @@ type Socks5ServerGroupBox struct {
 	portLineInput *widgets.QLineEdit
 	startButton   *widgets.QPushButton
 	stopButton    *widgets.QPushButton
-	infoLineEdit  *widgets.QLineEdit
 
 	s5s *socks5server.Socks5Server
 
 	layout *widgets.QGridLayout
+
+	_ func(string) `signal:"sendLog"`
 }
 
 func (gb *Socks5ServerGroupBox) Init() *Socks5ServerGroupBox {
@@ -37,7 +37,6 @@ func (gb *Socks5ServerGroupBox) Init() *Socks5ServerGroupBox {
 	gb.portLineInput = widgets.NewQLineEdit2("33899", nil)
 	gb.startButton = widgets.NewQPushButton2("开始", nil)
 	gb.stopButton = widgets.NewQPushButton2("结束", nil)
-	gb.infoLineEdit = widgets.NewQLineEdit(nil)
 
 	expandSizePol := widgets.NewQSizePolicy()
 	expandSizePol.SetHorizontalPolicy(widgets.QSizePolicy__Expanding)
@@ -45,7 +44,6 @@ func (gb *Socks5ServerGroupBox) Init() *Socks5ServerGroupBox {
 	gb.stopButton.SetSizePolicy(expandSizePol)
 
 	gb.stopButton.SetEnabled(false)
-	gb.infoLineEdit.SetReadOnly(true)
 
 	gb.portLineInput.SetValidator(gui.NewQIntValidator2(0, 65535, gb.portLineInput))
 
@@ -54,16 +52,17 @@ func (gb *Socks5ServerGroupBox) Init() *Socks5ServerGroupBox {
 	gb.layout.AddWidget2(gb.portLineInput, 0, 1, 0)
 	gb.layout.AddWidget2(gb.startButton, 1, 0, 0)
 	gb.layout.AddWidget2(gb.stopButton, 1, 1, 0)
-	gb.layout.AddWidget2(gb.infoLineEdit, 2, 0, 0)
 	gb.SetLayout(gb.layout)
 
 	gb.s5s = socks5server.NewSocks5Server(nil).Init()
 
 	gb.startButton.ConnectClicked(func(checked bool) {
 		gb.s5s.StartServer(gb.portLineInput.Text())
+		gb.SendLog(SprintfTimeln("user start server: port=%v", gb.portLineInput.Text()))
 	})
 	gb.stopButton.ConnectClicked(func(checked bool) {
 		gb.s5s.StopServer()
+		gb.SendLog(SprintfTimeln("user stop server: port=%v", gb.portLineInput.Text()))
 	})
 
 	gb.s5s.ConnectRunStateChange(gb.runStateChange)
@@ -75,12 +74,8 @@ func (gb *Socks5ServerGroupBox) Init() *Socks5ServerGroupBox {
 
 func (gb *Socks5ServerGroupBox) processRunningError(iErr interface{}) {
 
-	switch err := iErr.(type) {
-	case socks5.ListenError:
-		gb.infoLineEdit.SetText(err.Error())
-	default:
-		return
-	}
+	gb.SendLog(SprintfTimeln("%v", iErr))
+	gb.SendLog(SprintfTimeln("%v", "server stop with error"))
 }
 
 func (gb *Socks5ServerGroupBox) runStateChange(isRunning bool) {
@@ -92,15 +87,26 @@ func (gb *Socks5ServerGroupBox) runStateChange(isRunning bool) {
 type ProxyAppWidget struct {
 	widgets.QWidget
 
-	s5sGroupBox *Socks5ServerGroupBox
-	layout      *widgets.QGridLayout
+	s5sGroupBox       *Socks5ServerGroupBox
+	infoPlainTextEdit *widgets.QPlainTextEdit
+
+	layout *widgets.QGridLayout
 }
 
 func (w *ProxyAppWidget) Init() *ProxyAppWidget {
 	w.s5sGroupBox = NewSocks5ServerGroupBox(nil).Init()
+	w.s5sGroupBox.SetFixedHeight(100)
+
+	w.infoPlainTextEdit = widgets.NewQPlainTextEdit(nil)
+	w.infoPlainTextEdit.SetFixedHeight(200)
+	w.infoPlainTextEdit.SetReadOnly(true)
+	w.infoPlainTextEdit.SetLineWrapMode(widgets.QPlainTextEdit__NoWrap)
+	w.s5sGroupBox.ConnectSendLog(w.infoPlainTextEdit.AppendHtml)
 
 	w.layout = widgets.NewQGridLayout(nil)
-	w.layout.AddWidget2(w.s5sGroupBox, 1, 0, 0)
+	w.layout.AddWidget2(w.s5sGroupBox, 1, 0, core.Qt__AlignTop)
+	w.layout.AddWidget2(w.infoPlainTextEdit, 1, 0, core.Qt__AlignBottom)
+
 	w.SetLayout(w.layout)
 
 	return w
@@ -173,7 +179,7 @@ func main() {
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 
 	window := NewProxyAppWindow(nil, 0).Init()
-	window.SetFixedHeight(150)
+	window.SetFixedHeight(350)
 	window.SetFixedWidth(250)
 	window.SetWindowIcon(gui.NewQIcon5(":/qml/icon.ico"))
 
