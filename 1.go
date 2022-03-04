@@ -32,6 +32,7 @@ type Socks5ServerGroupBox struct {
 
 func (gb *Socks5ServerGroupBox) Init() *Socks5ServerGroupBox {
 
+	gb.SetTitle("socks5代理")
 	gb.portLabel = widgets.NewQLabel2("端口:", nil, 0)
 	gb.portLineInput = widgets.NewQLineEdit2("33899", nil)
 	gb.startButton = widgets.NewQPushButton2("开始", nil)
