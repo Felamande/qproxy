@@ -11,8 +11,12 @@ type Socks5Server struct {
 	core.QObject
 	lAddr    string
 	cancelFn func()
-	_        func(bool)        `signal:"runStateChange"`
-	_        func(interface{}) `signal:"receiveRunningError"`
+	logChan  chan error
+	server   *socks5.Server
+
+	_ func(bool)        `signal:"runStateChange"`
+	_ func(interface{}) `signal:"receiveRunningError"`
+	_ func(interface{}) `signal:"receiveServingError"`
 }
 
 func (s *Socks5Server) Init() *Socks5Server {
@@ -29,8 +33,12 @@ func (s *Socks5Server) StopServer() {
 
 func (s *Socks5Server) StartServer(port string) {
 
-	conf := &socks5.Config{}
+	s.logChan = make(chan error, 6)
+	conf := &socks5.Config{
+		LogChan: s.logChan,
+	}
 	server, _ := socks5.New(conf)
+	s.server = server
 	lAddr := ":" + port
 	s.lAddr = lAddr
 	ctx, cancelFn := context.WithCancel(context.Background())
@@ -38,10 +46,16 @@ func (s *Socks5Server) StartServer(port string) {
 
 	s.RunStateChange(true)
 	go func(ctxCancel context.Context) {
+
 		defer s.RunStateChange(false)
 		if err := server.ListenAndServeWithCtx("tcp", lAddr, ctxCancel); err != nil {
 			s.ReceiveRunningError(err)
-			return
 		}
 	}(ctx)
+
+	go func() {
+		for e := range s.logChan {
+			s.ReceiveServingError(e)
+		}
+	}()
 }

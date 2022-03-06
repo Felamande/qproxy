@@ -67,9 +67,13 @@ func (gb *Socks5ServerGroupBox) Init() *Socks5ServerGroupBox {
 
 	gb.s5s.ConnectRunStateChange(gb.runStateChange)
 	gb.s5s.ConnectReceiveRunningError(gb.processRunningError)
-
+	gb.s5s.ConnectReceiveServingError(gb.processServingError)
 	return gb
 
+}
+
+func (gb *Socks5ServerGroupBox) processServingError(iErr interface{}) {
+	gb.SendLog(SprintfTimeln("%v", iErr))
 }
 
 func (gb *Socks5ServerGroupBox) processRunningError(iErr interface{}) {
@@ -82,6 +86,19 @@ func (gb *Socks5ServerGroupBox) runStateChange(isRunning bool) {
 	gb.startButton.SetEnabled(!isRunning)
 	gb.stopButton.SetEnabled(isRunning)
 	gb.portLineInput.SetEnabled(!isRunning)
+}
+
+type NgrokGroupBox struct {
+	widgets.QGroupBox
+
+	clientIdLabel     *widgets.QLabel
+	clientIdLineInput *widgets.QLineEdit
+	startButton       *widgets.QPushButton
+	stopButton        *widgets.QPushButton
+
+	layout *widgets.QGridLayout
+
+	_ func(string) `signal:"sendLog"`
 }
 
 type ProxyAppWidget struct {

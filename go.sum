@@ -2,6 +2,8 @@ github.com/Felamande/go-socks5 v0.0.5 h1:+7Hoq2GdhodLpQ2HC1MEiUmCfU374juSIM8aBTF
 github.com/Felamande/go-socks5 v0.0.5/go.mod h1:UDiOZxTsBy5OeHvwYc3/I2C4m1EsggMfp3827n5UHI8=
 github.com/Felamande/go-socks5 v0.0.6 h1:z/UsNl/NoJ85KLVLe1AVyd+QgnlbB4+VtoBMXluqYRw=
 github.com/Felamande/go-socks5 v0.0.6/go.mod h1:UDiOZxTsBy5OeHvwYc3/I2C4m1EsggMfp3827n5UHI8=
+github.com/Felamande/go-socks5 v0.0.7 h1:fkI2Lq3ltnP4eUhoe5Vt98LMZ3Dg+7OEIIbh9DQ+mSg=
+github.com/Felamande/go-socks5 v0.0.7/go.mod h1:UDiOZxTsBy5OeHvwYc3/I2C4m1EsggMfp3827n5UHI8=
 github.com/Workiva/go-datastructures v1.0.53 h1:J6Y/52yX10Xc5JjXmGtWoSSxs3mZnGSaq37xZZh7Yig=
 github.com/Workiva/go-datastructures v1.0.53/go.mod h1:1yZL+zfsztete+ePzZz/Zb1/t5BnDuE2Ya2MMGhzP6A=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
