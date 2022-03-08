@@ -192,7 +192,7 @@ func (w *ProxyAppWindow) ShowTray() {
 	w.tray.Show()
 }
 
-func main() {
+func QtMain() {
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 
 	window := NewProxyAppWindow(nil, 0).Init()
