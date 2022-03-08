@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 
 	"github.com/Felamande/qproxy/socks5server"
@@ -22,8 +21,7 @@ func QmlMain(ini *ini.File) {
 	debug := ini.Section("").Key("qmldebug").MustBool(false)
 	debugQmlFile := ini.Section("").Key("qmldebug_file").MustString("../../qml/view.qml")
 
-	ok := socks5server.Socks5Server_QmlRegisterType2("socks5", 1, 0, "socks5server")
-	ioutil.WriteFile("ok.txt", []byte{byte(ok)}, 0777)
+	socks5server.Socks5Server_QmlRegisterType2("socks5", 1, 0, "socks5server")
 
 	var app = qml.NewQQmlApplicationEngine(nil)
 
