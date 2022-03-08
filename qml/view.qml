@@ -40,16 +40,21 @@
 
 //Slightly edited the original code for a scrollable TextArea and Qt Quick 2 controls
 
+// import socks5 1.0
 import QtQuick 2.2
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
 
 ApplicationWindow {
     visible: true
-    title: "Basic layouts"
+    title: "代理"
     property int margin: 11
     minimumWidth: 600
     minimumHeight: 450
+
+    // socks5server {
+    //     id:appSocks5server
+    // }
 
     ColumnLayout {
         id: mainLayout
@@ -57,83 +62,81 @@ ApplicationWindow {
         anchors.margins: margin
         GroupBox {
             id: rowBox
-            title: "Row layout"
+            title: "socks5代理"
             Layout.fillWidth: true
 
             RowLayout {
                 id: rowLayout
                 anchors.fill: parent
-                TextField {
-                    id:aTextField
-                    placeholderText: "This wants to grow horizontally"
+                Label {
+                    id: titleLabel
+                    elide: Label.ElideRight
+                    horizontalAlignment: Qt.AlignHCenter
+                    verticalAlignment: Qt.AlignVCenter
                     Layout.fillWidth: true
+                    text:"端口:"
+                }
+                TextField {
+                    id:portTextField
+                    Layout.fillWidth: true
+                    text:"33899"
+                    selectByMouse : true
+
                 }
                 Button {
                     id: aButton
                     text: "开始"
-                    property int aaa: 12
                     onClicked:function(bool){
-                        aTextField.text=aaa
-
+                        // appSocks5server.StartServer(portTextField.text)
                     }
                 }
                   Button {
                     id: bButton
                     text: "结束"
-                    property int bbb: 24
                     onClicked:function(bool){
-                        aTextField.text=bbb
 
                     }
                 }
             }
         }
-
-        GroupBox {
-          id: gridBox
-          title: "Grid layout"
-          Layout.fillWidth: true
-
-          GridLayout {
-              id: gridLayout
-              rows: 3
-              flow: GridLayout.TopToBottom
-              anchors.fill: parent
-              TextField { 
-                  anchors.fill: parent
-                  text:"Hello"
-              }
-          }
-        }
-        TextArea {
-            id: t3
-            text: "This fills the whole cell"
-            Layout.minimumHeight: 30
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-        }
         GroupBox {
             id: stackBox
-            title: "Stack layout"
+            title: "输出"
             implicitWidth: 200
             implicitHeight: 60
             Layout.fillWidth: true
             Layout.fillHeight: true
-            StackLayout {
-                id: stackLayout
+            Flickable {
+                id: flick
                 anchors.fill: parent
+                contentWidth: edit.paintedWidth
+                contentHeight: edit.paintedHeight
+                clip: true
 
-                function advance() { currentIndex = (currentIndex + 1) % count }
+                function ensureVisible(r)
+                {
+                    if (contentX >= r.x)
+                        contentX = r.x;
+                    else if (contentX+width <= r.x+r.width)
+                        contentX = r.x+r.width-width;
+                    if (contentY >= r.y)
+                        contentY = r.y;
+                    else if (contentY+height <= r.y+r.height)
+                        contentY = r.y+r.height-height;
+                }
 
-                Repeater {
-                    id: stackRepeater
-                    model: 5
-                    Rectangle {
-                        color: Qt.hsla((0.5 + index)/stackRepeater.count, 0.3, 0.7, 1)
-                        Button { anchors.centerIn: parent; text: "Page " + (index + 1); onClicked: { stackLayout.advance() } }
-                    }
+                TextEdit {
+                    id: edit
+                    width: flick.width
+                    focus: true
+                    wrapMode: TextEdit.Wrap
+                    onCursorRectangleChanged: flick.ensureVisible(cursorRectangle)
+                    text:"sddddddddddadaaaaaaaaaadas"
+                    selectByMouse : true
+                    readOnly : true
                 }
             }
+            
         }
     }
 }

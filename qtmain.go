@@ -10,6 +10,7 @@ import (
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
+	"gopkg.in/ini.v1"
 )
 
 var verTag string
@@ -54,7 +55,7 @@ func (gb *Socks5ServerGroupBox) Init() *Socks5ServerGroupBox {
 	gb.layout.AddWidget2(gb.stopButton, 1, 1, 0)
 	gb.SetLayout(gb.layout)
 
-	gb.s5s = socks5server.NewSocks5Server(nil).Init()
+	gb.s5s = socks5server.NewSocks5Server(nil)
 
 	gb.startButton.ConnectClicked(func(checked bool) {
 		gb.s5s.StartServer(gb.portLineInput.Text())
@@ -192,7 +193,7 @@ func (w *ProxyAppWindow) ShowTray() {
 	w.tray.Show()
 }
 
-func QtMain() {
+func QtMain(ini *ini.File) {
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 
 	window := NewProxyAppWindow(nil, 0).Init()

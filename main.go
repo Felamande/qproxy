@@ -6,7 +6,7 @@ import (
 
 func main() {
 	launchType := "qtwidget"
-	launchTypeMap := map[string]func(){
+	launchTypeMap := map[string]func(*ini.File){
 		"qtwidget": QtMain,
 		"qml":      QmlMain,
 	}
@@ -18,5 +18,5 @@ func main() {
 		}
 	}
 
-	launchTypeMap[launchType]()
+	launchTypeMap[launchType](iniCfg)
 }

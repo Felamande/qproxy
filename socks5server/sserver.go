@@ -14,16 +14,20 @@ type Socks5Server struct {
 	logChan  chan error
 	server   *socks5.Server
 
+	_ func()            `constructor:"init"`
 	_ func(bool)        `signal:"runStateChange"`
 	_ func(interface{}) `signal:"receiveRunningError"`
 	_ func(interface{}) `signal:"receiveServingError"`
+	_ func(string)      `slot:"StartServer"`
+	_ func()            `slot:"StopServer"`
 }
 
-func (s *Socks5Server) Init() *Socks5Server {
-	return s
+func (s *Socks5Server) init() {
+	s.ConnectStartServer(s.startServer)
+	s.ConnectStopServer(s.stopServer)
 }
 
-func (s *Socks5Server) StopServer() {
+func (s *Socks5Server) stopServer() {
 	if s.cancelFn != nil {
 		s.cancelFn()
 		s.RunStateChange(false)
@@ -31,7 +35,7 @@ func (s *Socks5Server) StopServer() {
 	}
 }
 
-func (s *Socks5Server) StartServer(port string) {
+func (s *Socks5Server) startServer(port string) {
 
 	s.logChan = make(chan error, 6)
 	conf := &socks5.Config{

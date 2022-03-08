@@ -1,20 +1,39 @@
 package main
 
 import (
+	"io/ioutil"
 	"os"
 
+	"github.com/Felamande/qproxy/socks5server"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/qml"
+	"gopkg.in/ini.v1"
 )
 
-func QmlMain() {
+func init() {
+
+}
+
+func QmlMain(ini *ini.File) {
+	gui.NewQGuiApplication(len(os.Args), os.Args)
 	core.QCoreApplication_SetAttribute(core.Qt__AA_EnableHighDpiScaling, true)
 
-	gui.NewQGuiApplication(len(os.Args), os.Args)
+	debug := ini.Section("").Key("qmldebug").MustBool(false)
+	debugQmlFile := ini.Section("").Key("qmldebug_file").MustString("../../qml/view.qml")
+
+	ok := socks5server.Socks5Server_QmlRegisterType2("socks5", 1, 0, "socks5server")
+	ioutil.WriteFile("ok.txt", []byte{byte(ok)}, 0777)
 
 	var app = qml.NewQQmlApplicationEngine(nil)
-	app.Load(core.NewQUrl3("qrc:/qml/view.qml", 0))
+
+	if debug {
+		app.Load(core.QUrl_FromLocalFile(debugQmlFile))
+	} else {
+		app.Load(core.NewQUrl3("qrc:/qml/view.qml", 0))
+
+	}
 
 	gui.QGuiApplication_Exec()
+
 }
