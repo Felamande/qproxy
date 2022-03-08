@@ -176,7 +176,7 @@ func (w *ProxyAppWindow) Init() *ProxyAppWindow {
 		w.tray.Hide()
 		core.QCoreApplication_Instance().Quit()
 	}).AddAction("关于程序", func(b bool) {
-		widgets.QMessageBox_About(nil, "about qproxy", fmt.Sprintf("qproxy %s(%s)\nQt %s\n%s", verTag, verCommitHash, core.QtGlobal_qVersion(), strings.Replace(runtime.Version(), "go", "Go", -1)))
+		widgets.QMessageBox_About(nil, "about qproxy", fmt.Sprintf("qproxy %s\ncommit:%s\n\nQt %s\n%s\n©tzh", verTag, verCommitHash, core.QtGlobal_qVersion(), strings.Replace(runtime.Version(), "go", "Go", -1)))
 	})
 
 	w.tray.ConnectActivated(func(reason widgets.QSystemTrayIcon__ActivationReason) {
