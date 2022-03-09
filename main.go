@@ -12,7 +12,7 @@ func main() {
 	}
 	iniCfg, err := ini.Load("launch.ini")
 	if err == nil {
-		typ := iniCfg.Section("").Key("launch").MustString("qtwidget")
+		typ := iniCfg.Section("").Key("launch").MustString("qml")
 		if _, ok := launchTypeMap[typ]; ok {
 			launchType = typ
 		}
