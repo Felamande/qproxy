@@ -40,21 +40,67 @@
 
 //Slightly edited the original code for a scrollable TextArea and Qt Quick 2 controls
 
-// import socks5 1.0
+import Socks5 1.0
 import QtQuick 2.2
-import QtQuick.Controls 2.0
+import QtQuick.Controls 2.3
 import QtQuick.Layouts 1.3
+import Qt.labs.platform 1.1
 
 ApplicationWindow {
+    id:appWindow
     visible: true
     title: "代理"
     property int margin: 11
     minimumWidth: 600
     minimumHeight: 450
+    maximumWidth: 600
+    maximumHeight: 450
 
-    // socks5server {
-    //     id:appSocks5server
-    // }
+
+    function outputEditWithTime(msg){
+        outputEdit.append(Qt.formatDateTime(new Date(),"[MM-dd hh:mm:ss.zzz]")+msg)
+    }
+
+    SystemTrayIcon {
+        id:appTray
+        visible:true
+        icon.source:"qrc:/qml/icon.ico"
+        onActivated:function(reason){
+            switch(reason){
+                case SystemTrayIcon.DoubleClick:
+                appWindow.show()
+                appWindow.raise()
+                appWindow.requestActivated()
+                default:
+            } 
+        }
+        menu:Menu {
+            MenuItem {
+                text: "退出"
+                onTriggered: {
+                    appTray.hide()
+                    Qt.quit()
+
+                }
+            }
+    }
+    }
+
+    Socks5server {
+        id:appSocks5server
+        onRunStateChange:function(isRunning){
+            startButton.enabled = !isRunning
+            stopButton.enabled =  isRunning
+            portTextField.enabled = !isRunning
+        }
+        onReceiveRunningError:function(msg){
+            outputEditWithTime(String(msg))
+            outputEditWithTime("server stop with error")
+        }
+        onReceiveServingError:function(msg){
+            outputEditWithTime(String(msg))
+        }
+    }
 
     ColumnLayout {
         id: mainLayout
@@ -79,28 +125,40 @@ ApplicationWindow {
                 TextField {
                     id:portTextField
                     Layout.fillWidth: true
+                    validator: IntValidator {bottom: 1; top: 65535;}
                     text:"33899"
                     selectByMouse : true
 
                 }
                 Button {
-                    id: aButton
+                    id: startButton
                     text: "开始"
-                    onClicked:function(bool){
-                        // appSocks5server.StartServer(portTextField.text)
+                    onClicked:function(clicked){
+                        try{
+                        outputEditWithTime("user start server:port="+portTextField.text)
+                        appSocks5server.startServer(portTextField.text)
+                        }catch(e){
+                            outputEdit.append(String(e))
+                        }
                     }
                 }
                   Button {
-                    id: bButton
+                    id: stopButton
                     text: "结束"
+                    enabled:false
                     onClicked:function(bool){
-
+                        try{
+                        outputEditWithTime("user stop server:port="+portTextField.text)
+                        appSocks5server.stopServer()
+                        }catch(e){
+                        outputEdit.append(String(e))
+                        }
                     }
                 }
             }
         }
         GroupBox {
-            id: stackBox
+            id: outputBox
             title: "输出"
             implicitWidth: 200
             implicitHeight: 60
@@ -109,8 +167,8 @@ ApplicationWindow {
             Flickable {
                 id: flick
                 anchors.fill: parent
-                contentWidth: edit.paintedWidth
-                contentHeight: edit.paintedHeight
+                contentWidth: outputEdit.paintedWidth
+                contentHeight: outputEdit.paintedHeight
                 clip: true
 
                 function ensureVisible(r)
@@ -126,12 +184,12 @@ ApplicationWindow {
                 }
 
                 TextEdit {
-                    id: edit
+                    id: outputEdit
                     width: flick.width
                     focus: true
                     wrapMode: TextEdit.Wrap
                     onCursorRectangleChanged: flick.ensureVisible(cursorRectangle)
-                    text:"sddddddddddadaaaaaaaaaadas"
+                    text: "qproxy "+VerGetter.VerTag+"\ncommit: "+VerGetter.VerCommitHash+"\nGo "+VerGetter.GoVersion+"\nQt "+VerGetter.QtVersion
                     selectByMouse : true
                     readOnly : true
                 }

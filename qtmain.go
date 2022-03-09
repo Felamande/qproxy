@@ -73,13 +73,13 @@ func (gb *Socks5ServerGroupBox) Init() *Socks5ServerGroupBox {
 
 }
 
-func (gb *Socks5ServerGroupBox) processServingError(iErr interface{}) {
-	gb.SendLog(SprintfTimeln("%v", iErr))
+func (gb *Socks5ServerGroupBox) processServingError(msg string) {
+	gb.SendLog(SprintfTimeln("%v", msg))
 }
 
-func (gb *Socks5ServerGroupBox) processRunningError(iErr interface{}) {
+func (gb *Socks5ServerGroupBox) processRunningError(msg string) {
 
-	gb.SendLog(SprintfTimeln("%v", iErr))
+	gb.SendLog(SprintfTimeln("%v", msg))
 	gb.SendLog(SprintfTimeln("%v", "server stop with error"))
 }
 
@@ -176,7 +176,7 @@ func (w *ProxyAppWindow) Init() *ProxyAppWindow {
 		w.tray.Hide()
 		core.QCoreApplication_Instance().Quit()
 	}).AddAction("关于程序", func(b bool) {
-		widgets.QMessageBox_About(nil, "about qproxy", fmt.Sprintf("qproxy %s\ncommit:%s\n©tzh\n\nQt %s\n%s", verTag, verCommitHash, core.QtGlobal_qVersion(), strings.Replace(runtime.Version(), "go", "Go", -1)))
+		widgets.QMessageBox_About(nil, "about qproxy", fmt.Sprintf("qproxy %s\ncommit: %s\n©tzh\n\nQt %s\n%s", verTag, verCommitHash, core.QtGlobal_qVersion(), strings.Replace(runtime.Version(), "go", "Go", -1)))
 	})
 
 	w.tray.ConnectActivated(func(reason widgets.QSystemTrayIcon__ActivationReason) {
@@ -204,6 +204,6 @@ func QtMain(ini *ini.File) {
 	window.Show()
 	window.ShowTray()
 
-	gui.QGuiApplication_SetQuitOnLastWindowClosed(false)
+	app.SetQuitOnLastWindowClosed(false)
 	app.Exec()
 }

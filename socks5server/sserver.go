@@ -14,12 +14,12 @@ type Socks5Server struct {
 	logChan  chan error
 	server   *socks5.Server
 
-	_ func()            `constructor:"init"`
-	_ func(bool)        `signal:"runStateChange"`
-	_ func(interface{}) `signal:"receiveRunningError"`
-	_ func(interface{}) `signal:"receiveServingError"`
-	_ func(string)      `slot:"StartServer"`
-	_ func()            `slot:"StopServer"`
+	_ func()       `constructor:"init"`
+	_ func(bool)   `signal:"runStateChange"`
+	_ func(string) `signal:"receiveRunningError"`
+	_ func(string) `signal:"receiveServingError"`
+	_ func(string) `slot:"StartServer"`
+	_ func()       `slot:"StopServer"`
 }
 
 func (s *Socks5Server) init() {
@@ -53,13 +53,13 @@ func (s *Socks5Server) startServer(port string) {
 
 		defer s.RunStateChange(false)
 		if err := server.ListenAndServeWithCtx("tcp", lAddr, ctxCancel); err != nil {
-			s.ReceiveRunningError(err)
+			s.ReceiveRunningError(err.Error())
 		}
 	}(ctx)
 
 	go func() {
 		for e := range s.logChan {
-			s.ReceiveServingError(e)
+			s.ReceiveServingError(e.Error())
 		}
 	}()
 }
