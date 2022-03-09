@@ -56,7 +56,18 @@ ApplicationWindow {
     maximumWidth: 600
     maximumHeight: 450
 
-
+    MenuBar {
+        Menu {
+            title: qsTr("&File")
+            MenuItem {
+                text: qsTr("&Quit")
+                onTriggered: {
+                    appTray.hide()
+                    Qt.quit()
+                }
+            }
+        }
+    }
     function outputEditWithTime(msg){
         outputEdit.append(Qt.formatDateTime(new Date(),"[MM-dd hh:mm:ss.zzz]")+msg)
     }
