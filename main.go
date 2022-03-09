@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	launchType := "qtwidget"
+	launchType := "qml"
 	launchTypeMap := map[string]func(*ini.File){
 		"qtwidget": QtMain,
 		"qml":      QmlMain,
