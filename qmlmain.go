@@ -32,11 +32,20 @@ func (v *VerGetter) init() {
 }
 
 func QmlMain(ini *ini.File) {
+
+	var debug bool
+	var debugQmlFile string
+
 	gapp := gui.NewQGuiApplication(len(os.Args), os.Args)
 	gapp.SetAttribute(core.Qt__AA_EnableHighDpiScaling, true)
 
-	debug := ini.Section("").Key("qmldebug").MustBool(false)
-	debugQmlFile := ini.Section("").Key("qmldebug_file").MustString("../../qml/view.qml")
+	if ini != nil {
+		debug = false
+		debugQmlFile = "../../qml/view.qml"
+	} else {
+		debug = ini.Section("").Key("qmldebug").MustBool(false)
+		debugQmlFile = ini.Section("").Key("qmldebug_file").MustString("../../qml/view.qml")
+	}
 
 	socks5server.Socks5Server_QmlRegisterType2("Socks5", 1, 0, "Socks5server")
 
