@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	launchType := "qml"
+	launchType := defaultCfg["launch"].(string)
 	launchTypeMap := map[string]func(){
 		"qtwidget": QtMain,
 		"qml":      QmlMain,
