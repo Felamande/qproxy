@@ -33,14 +33,11 @@ func (v *VerGetter) init() {
 
 func QmlMain() {
 
-	var debug bool
-	var debugQmlFile string
-
 	gapp := gui.NewQGuiApplication(len(os.Args), os.Args)
 	gapp.SetAttribute(core.Qt__AA_EnableHighDpiScaling, true)
 
-	debug = viper.GetBool("qmldebug")
-	debugQmlFile = viper.GetString("qmldebug_file")
+	debug := viper.GetBool("qmldebug")
+	debugQmlFile := viper.GetString("qmldebug_file")
 
 	socks5server.Socks5Server_QmlRegisterType2("Socks5", 1, 0, "Socks5server")
 
