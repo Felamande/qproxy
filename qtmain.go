@@ -10,7 +10,6 @@ import (
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
-	"gopkg.in/ini.v1"
 )
 
 var verTag string
@@ -193,7 +192,7 @@ func (w *ProxyAppWindow) ShowTray() {
 	w.tray.Show()
 }
 
-func QtMain(ini *ini.File) {
+func QtMain() {
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 
 	window := NewProxyAppWindow(nil, 0).Init()

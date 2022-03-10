@@ -1,22 +1,19 @@
 package main
 
 import (
-	"gopkg.in/ini.v1"
+	"github.com/spf13/viper"
 )
 
 func main() {
 	launchType := "qml"
-	launchTypeMap := map[string]func(*ini.File){
+	launchTypeMap := map[string]func(){
 		"qtwidget": QtMain,
 		"qml":      QmlMain,
 	}
-	iniCfg, err := ini.Load("launch.ini")
-	if err == nil {
-		typ := iniCfg.Section("").Key("launch").MustString("qml")
-		if _, ok := launchTypeMap[typ]; ok {
-			launchType = typ
-		}
+	typ := viper.GetString("launch")
+	if _, ok := launchTypeMap[typ]; ok {
+		launchType = typ
 	}
 
-	launchTypeMap[launchType](iniCfg)
+	launchTypeMap[launchType]()
 }

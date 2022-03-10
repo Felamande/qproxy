@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"github.com/Felamande/qproxy/socks5server"
+	"github.com/spf13/viper"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/qml"
-	"gopkg.in/ini.v1"
 )
 
 type VerGetter struct {
@@ -31,7 +31,7 @@ func (v *VerGetter) init() {
 	v.SetQtVersion(core.QtGlobal_qVersion())
 }
 
-func QmlMain(ini *ini.File) {
+func QmlMain() {
 
 	var debug bool
 	var debugQmlFile string
@@ -39,13 +39,8 @@ func QmlMain(ini *ini.File) {
 	gapp := gui.NewQGuiApplication(len(os.Args), os.Args)
 	gapp.SetAttribute(core.Qt__AA_EnableHighDpiScaling, true)
 
-	if ini != nil {
-		debug = false
-		debugQmlFile = "../../qml/view.qml"
-	} else {
-		debug = ini.Section("").Key("qmldebug").MustBool(false)
-		debugQmlFile = ini.Section("").Key("qmldebug_file").MustString("../../qml/view.qml")
-	}
+	debug = viper.GetBool("qmldebug")
+	debugQmlFile = viper.GetString("qmldebug_file")
 
 	socks5server.Socks5Server_QmlRegisterType2("Socks5", 1, 0, "Socks5server")
 
