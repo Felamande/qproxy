@@ -55,7 +55,7 @@ ApplicationWindow {
     minimumHeight: 450
     maximumWidth: 600
     maximumHeight: 450
-
+    
     MenuBar {
         Menu {
             title: qsTr("&File")
@@ -76,6 +76,7 @@ ApplicationWindow {
         id:appTray
         visible:true
         icon.source:"qrc:/qml/icon.ico"
+        tooltip:"qproxy:未运行"
         onActivated:function(reason){
             switch(reason){
                 case SystemTrayIcon.DoubleClick:
@@ -103,6 +104,14 @@ ApplicationWindow {
             startButton.enabled = !isRunning
             stopButton.enabled =  isRunning
             portTextField.enabled = !isRunning
+            var tip = ""
+            if(isRunning){
+                tip = "运行中"
+            }else{
+                tip = "未运行"
+            }
+                
+            appTray.tooltip = "qproxy:"+tip
         }
         onReceiveRunningError:function(msg){
             outputEditWithTime(String(msg))

@@ -167,6 +167,7 @@ func (w *ProxyAppWindow) Init() *ProxyAppWindow {
 
 	w.tray = NewProxyAppTray(nil).Init()
 	w.tray.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
+	w.tray.SetToolTip("qproxy")
 
 	w.tray.AddAction("打开界面", func(bool) {
 		w.Show()
