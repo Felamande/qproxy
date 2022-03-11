@@ -55,7 +55,19 @@ ApplicationWindow {
     minimumHeight: 450
     maximumWidth: 600
     maximumHeight: 450
-    
+    footer:ToolBar{
+        height:20
+        RowLayout{
+            anchors.fill:parent
+            Item{
+                Layout.fillWidth: true
+                Text{
+                    anchors.verticalCenter: parent.verticalCenter
+                    text:"  qproxy "+VerGetter.VerTag+" commit: "+VerGetter.VerCommitHash+" Go "+VerGetter.GoVersion+" Qt "+VerGetter.QtVersion
+                }
+            }
+        }
+    }
     MenuBar {
         Menu {
             title: qsTr("&File")
@@ -209,7 +221,7 @@ ApplicationWindow {
                     focus: true
                     wrapMode: TextEdit.Wrap
                     onCursorRectangleChanged: flick.ensureVisible(cursorRectangle)
-                    text: "qproxy "+VerGetter.VerTag+"\ncommit: "+VerGetter.VerCommitHash+"\nGo "+VerGetter.GoVersion+"\nQt "+VerGetter.QtVersion
+                    text: ""
                     selectByMouse : true
                     readOnly : true
                 }
