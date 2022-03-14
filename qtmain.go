@@ -1,193 +1,181 @@
 package main
 
-import (
-	"fmt"
-	"os"
-	"runtime"
-	"strings"
+// type Socks5ServerGroupBox struct {
+// 	widgets.QGroupBox
 
-	"github.com/Felamande/qproxy/socks5server"
-	"github.com/therecipe/qt/core"
-	"github.com/therecipe/qt/gui"
-	"github.com/therecipe/qt/widgets"
-)
+// 	portLabel     *widgets.QLabel
+// 	portLineInput *widgets.QLineEdit
+// 	startButton   *widgets.QPushButton
+// 	stopButton    *widgets.QPushButton
 
-type Socks5ServerGroupBox struct {
-	widgets.QGroupBox
+// 	s5s *socks5server.Socks5Server
 
-	portLabel     *widgets.QLabel
-	portLineInput *widgets.QLineEdit
-	startButton   *widgets.QPushButton
-	stopButton    *widgets.QPushButton
+// 	layout *widgets.QGridLayout
 
-	s5s *socks5server.Socks5Server
+// 	_ func(string) `signal:"sendLog"`
+// }
 
-	layout *widgets.QGridLayout
+// func (gb *Socks5ServerGroupBox) Init() *Socks5ServerGroupBox {
 
-	_ func(string) `signal:"sendLog"`
-}
+// 	gb.SetTitle("socks5代理")
+// 	gb.portLabel = widgets.NewQLabel2("端口:", nil, 0)
+// 	gb.portLineInput = widgets.NewQLineEdit2("33899", nil)
+// 	gb.startButton = widgets.NewQPushButton2("开始", nil)
+// 	gb.stopButton = widgets.NewQPushButton2("结束", nil)
 
-func (gb *Socks5ServerGroupBox) Init() *Socks5ServerGroupBox {
+// 	expandSizePol := widgets.NewQSizePolicy()
+// 	expandSizePol.SetHorizontalPolicy(widgets.QSizePolicy__Expanding)
+// 	gb.startButton.SetSizePolicy(expandSizePol)
+// 	gb.stopButton.SetSizePolicy(expandSizePol)
 
-	gb.SetTitle("socks5代理")
-	gb.portLabel = widgets.NewQLabel2("端口:", nil, 0)
-	gb.portLineInput = widgets.NewQLineEdit2("33899", nil)
-	gb.startButton = widgets.NewQPushButton2("开始", nil)
-	gb.stopButton = widgets.NewQPushButton2("结束", nil)
+// 	gb.stopButton.SetEnabled(false)
 
-	expandSizePol := widgets.NewQSizePolicy()
-	expandSizePol.SetHorizontalPolicy(widgets.QSizePolicy__Expanding)
-	gb.startButton.SetSizePolicy(expandSizePol)
-	gb.stopButton.SetSizePolicy(expandSizePol)
+// 	gb.portLineInput.SetValidator(gui.NewQIntValidator2(0, 65535, gb.portLineInput))
 
-	gb.stopButton.SetEnabled(false)
+// 	gb.layout = widgets.NewQGridLayout2()
+// 	gb.layout.AddWidget2(gb.portLabel, 0, 0, 0)
+// 	gb.layout.AddWidget2(gb.portLineInput, 0, 1, 0)
+// 	gb.layout.AddWidget2(gb.startButton, 1, 0, 0)
+// 	gb.layout.AddWidget2(gb.stopButton, 1, 1, 0)
+// 	gb.SetLayout(gb.layout)
 
-	gb.portLineInput.SetValidator(gui.NewQIntValidator2(0, 65535, gb.portLineInput))
+// 	gb.s5s = socks5server.NewSocks5Server(nil)
 
-	gb.layout = widgets.NewQGridLayout2()
-	gb.layout.AddWidget2(gb.portLabel, 0, 0, 0)
-	gb.layout.AddWidget2(gb.portLineInput, 0, 1, 0)
-	gb.layout.AddWidget2(gb.startButton, 1, 0, 0)
-	gb.layout.AddWidget2(gb.stopButton, 1, 1, 0)
-	gb.SetLayout(gb.layout)
+// 	gb.startButton.ConnectClicked(func(checked bool) {
+// 		gb.s5s.StartServer(gb.portLineInput.Text())
+// 		gb.SendLog(SprintfTimeln("user start server: port=%v", gb.portLineInput.Text()))
+// 	})
+// 	gb.stopButton.ConnectClicked(func(checked bool) {
+// 		gb.s5s.StopServer()
+// 		gb.SendLog(SprintfTimeln("user stop server: port=%v", gb.portLineInput.Text()))
+// 	})
 
-	gb.s5s = socks5server.NewSocks5Server(nil)
+// 	gb.s5s.ConnectRunStateChange(gb.runStateChange)
+// 	gb.s5s.ConnectReceiveRunningError(gb.processRunningError)
+// 	gb.s5s.ConnectReceiveServingError(gb.processServingError)
+// 	return gb
 
-	gb.startButton.ConnectClicked(func(checked bool) {
-		gb.s5s.StartServer(gb.portLineInput.Text())
-		gb.SendLog(SprintfTimeln("user start server: port=%v", gb.portLineInput.Text()))
-	})
-	gb.stopButton.ConnectClicked(func(checked bool) {
-		gb.s5s.StopServer()
-		gb.SendLog(SprintfTimeln("user stop server: port=%v", gb.portLineInput.Text()))
-	})
+// }
 
-	gb.s5s.ConnectRunStateChange(gb.runStateChange)
-	gb.s5s.ConnectReceiveRunningError(gb.processRunningError)
-	gb.s5s.ConnectReceiveServingError(gb.processServingError)
-	return gb
+// func (gb *Socks5ServerGroupBox) processServingError(msg string) {
+// 	gb.SendLog(SprintfTimeln("%v", msg))
+// }
 
-}
+// func (gb *Socks5ServerGroupBox) processRunningError(msg string) {
 
-func (gb *Socks5ServerGroupBox) processServingError(msg string) {
-	gb.SendLog(SprintfTimeln("%v", msg))
-}
+// 	gb.SendLog(SprintfTimeln("%v", msg))
+// 	gb.SendLog(SprintfTimeln("%v", "server stop with error"))
+// }
 
-func (gb *Socks5ServerGroupBox) processRunningError(msg string) {
+// func (gb *Socks5ServerGroupBox) runStateChange(isRunning bool) {
+// 	gb.startButton.SetEnabled(!isRunning)
+// 	gb.stopButton.SetEnabled(isRunning)
+// 	gb.portLineInput.SetEnabled(!isRunning)
+// }
 
-	gb.SendLog(SprintfTimeln("%v", msg))
-	gb.SendLog(SprintfTimeln("%v", "server stop with error"))
-}
+// type ProxyAppWidget struct {
+// 	widgets.QWidget
 
-func (gb *Socks5ServerGroupBox) runStateChange(isRunning bool) {
-	gb.startButton.SetEnabled(!isRunning)
-	gb.stopButton.SetEnabled(isRunning)
-	gb.portLineInput.SetEnabled(!isRunning)
-}
+// 	s5sGroupBox       *Socks5ServerGroupBox
+// 	infoPlainTextEdit *widgets.QPlainTextEdit
 
-type ProxyAppWidget struct {
-	widgets.QWidget
+// 	layout *widgets.QGridLayout
+// }
 
-	s5sGroupBox       *Socks5ServerGroupBox
-	infoPlainTextEdit *widgets.QPlainTextEdit
+// func (w *ProxyAppWidget) Init() *ProxyAppWidget {
+// 	w.s5sGroupBox = NewSocks5ServerGroupBox(nil).Init()
+// 	w.s5sGroupBox.SetFixedHeight(100)
 
-	layout *widgets.QGridLayout
-}
+// 	w.infoPlainTextEdit = widgets.NewQPlainTextEdit(nil)
+// 	w.infoPlainTextEdit.SetFixedHeight(200)
+// 	w.infoPlainTextEdit.SetReadOnly(true)
+// 	w.infoPlainTextEdit.SetLineWrapMode(widgets.QPlainTextEdit__NoWrap)
+// 	w.s5sGroupBox.ConnectSendLog(w.infoPlainTextEdit.AppendHtml)
 
-func (w *ProxyAppWidget) Init() *ProxyAppWidget {
-	w.s5sGroupBox = NewSocks5ServerGroupBox(nil).Init()
-	w.s5sGroupBox.SetFixedHeight(100)
+// 	w.layout = widgets.NewQGridLayout(nil)
+// 	w.layout.AddWidget2(w.s5sGroupBox, 1, 0, core.Qt__AlignTop)
+// 	w.layout.AddWidget2(w.infoPlainTextEdit, 1, 0, core.Qt__AlignBottom)
 
-	w.infoPlainTextEdit = widgets.NewQPlainTextEdit(nil)
-	w.infoPlainTextEdit.SetFixedHeight(200)
-	w.infoPlainTextEdit.SetReadOnly(true)
-	w.infoPlainTextEdit.SetLineWrapMode(widgets.QPlainTextEdit__NoWrap)
-	w.s5sGroupBox.ConnectSendLog(w.infoPlainTextEdit.AppendHtml)
+// 	w.SetLayout(w.layout)
 
-	w.layout = widgets.NewQGridLayout(nil)
-	w.layout.AddWidget2(w.s5sGroupBox, 1, 0, core.Qt__AlignTop)
-	w.layout.AddWidget2(w.infoPlainTextEdit, 1, 0, core.Qt__AlignBottom)
+// 	return w
+// }
 
-	w.SetLayout(w.layout)
+// type ProxyAppTray struct {
+// 	widgets.QSystemTrayIcon
 
-	return w
-}
+// 	menu    *widgets.QMenu
+// 	actions map[string]*widgets.QAction
+// }
 
-type ProxyAppTray struct {
-	widgets.QSystemTrayIcon
+// func (t *ProxyAppTray) Init() *ProxyAppTray {
+// 	t.actions = make(map[string]*widgets.QAction)
+// 	t.menu = widgets.NewQMenu(nil)
+// 	t.SetContextMenu(t.menu)
 
-	menu    *widgets.QMenu
-	actions map[string]*widgets.QAction
-}
+// 	return t
+// }
 
-func (t *ProxyAppTray) Init() *ProxyAppTray {
-	t.actions = make(map[string]*widgets.QAction)
-	t.menu = widgets.NewQMenu(nil)
-	t.SetContextMenu(t.menu)
+// func (t *ProxyAppTray) AddAction(text string, triggerFn func(bool)) *ProxyAppTray {
+// 	action := t.menu.AddAction(text)
 
-	return t
-}
+// 	action.ConnectTriggered(triggerFn)
+// 	t.actions[text] = action
 
-func (t *ProxyAppTray) AddAction(text string, triggerFn func(bool)) *ProxyAppTray {
-	action := t.menu.AddAction(text)
+// 	return t
+// }
 
-	action.ConnectTriggered(triggerFn)
-	t.actions[text] = action
+// type ProxyAppWindow struct {
+// 	widgets.QMainWindow
 
-	return t
-}
+// 	appWidget *ProxyAppWidget
 
-type ProxyAppWindow struct {
-	widgets.QMainWindow
+// 	tray *ProxyAppTray
+// }
 
-	appWidget *ProxyAppWidget
+// func (w *ProxyAppWindow) Init() *ProxyAppWindow {
+// 	w.appWidget = NewProxyAppWidget(w, 0).Init()
+// 	w.SetCentralWidget(w.appWidget)
 
-	tray *ProxyAppTray
-}
+// 	w.tray = NewProxyAppTray(nil).Init()
+// 	w.tray.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
+// 	w.tray.SetToolTip("qproxy")
 
-func (w *ProxyAppWindow) Init() *ProxyAppWindow {
-	w.appWidget = NewProxyAppWidget(w, 0).Init()
-	w.SetCentralWidget(w.appWidget)
+// 	w.tray.AddAction("打开界面", func(bool) {
+// 		w.Show()
+// 	}).AddAction("关闭程序", func(bool) {
+// 		gui.QGuiApplication_SetQuitOnLastWindowClosed(true)
+// 		w.tray.Hide()
+// 		core.QCoreApplication_Instance().Quit()
+// 	}).AddAction("关于程序", func(b bool) {
+// 		widgets.QMessageBox_About(nil, "about qproxy", fmt.Sprintf("qproxy %s\ncommit: %s\n©tzh\n\nQt %s\n%s", verTag, verCommitHash, core.QtGlobal_qVersion(), strings.Replace(runtime.Version(), "go", "Go", -1)))
+// 	})
 
-	w.tray = NewProxyAppTray(nil).Init()
-	w.tray.SetIcon(gui.NewQIcon5(":/qml/icon.ico"))
-	w.tray.SetToolTip("qproxy")
+// 	w.tray.ConnectActivated(func(reason widgets.QSystemTrayIcon__ActivationReason) {
+// 		switch reason {
+// 		case widgets.QSystemTrayIcon__DoubleClick:
+// 			w.Show()
+// 		}
+// 	})
 
-	w.tray.AddAction("打开界面", func(bool) {
-		w.Show()
-	}).AddAction("关闭程序", func(bool) {
-		gui.QGuiApplication_SetQuitOnLastWindowClosed(true)
-		w.tray.Hide()
-		core.QCoreApplication_Instance().Quit()
-	}).AddAction("关于程序", func(b bool) {
-		widgets.QMessageBox_About(nil, "about qproxy", fmt.Sprintf("qproxy %s\ncommit: %s\n©tzh\n\nQt %s\n%s", verTag, verCommitHash, core.QtGlobal_qVersion(), strings.Replace(runtime.Version(), "go", "Go", -1)))
-	})
+// 	return w
+// }
 
-	w.tray.ConnectActivated(func(reason widgets.QSystemTrayIcon__ActivationReason) {
-		switch reason {
-		case widgets.QSystemTrayIcon__DoubleClick:
-			w.Show()
-		}
-	})
-
-	return w
-}
-
-func (w *ProxyAppWindow) ShowTray() {
-	w.tray.Show()
-}
+// func (w *ProxyAppWindow) ShowTray() {
+// 	w.tray.Show()
+// }
 
 func QtMain() {
-	app := widgets.NewQApplication(len(os.Args), os.Args)
+	// app := widgets.NewQApplication(len(os.Args), os.Args)
 
-	window := NewProxyAppWindow(nil, 0).Init()
-	window.SetFixedHeight(350)
-	window.SetFixedWidth(250)
-	window.SetWindowIcon(gui.NewQIcon5(":/qml/icon.ico"))
+	// window := NewProxyAppWindow(nil, 0).Init()
+	// window.SetFixedHeight(350)
+	// window.SetFixedWidth(250)
+	// window.SetWindowIcon(gui.NewQIcon5(":/qml/icon.ico"))
 
-	window.Show()
-	window.ShowTray()
+	// window.Show()
+	// window.ShowTray()
 
-	app.SetQuitOnLastWindowClosed(false)
-	app.Exec()
+	// app.SetQuitOnLastWindowClosed(false)
+	// app.Exec()
 }
