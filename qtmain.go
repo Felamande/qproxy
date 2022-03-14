@@ -12,9 +12,6 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
-var verTag string
-var verCommitHash string
-
 type Socks5ServerGroupBox struct {
 	widgets.QGroupBox
 
@@ -86,19 +83,6 @@ func (gb *Socks5ServerGroupBox) runStateChange(isRunning bool) {
 	gb.startButton.SetEnabled(!isRunning)
 	gb.stopButton.SetEnabled(isRunning)
 	gb.portLineInput.SetEnabled(!isRunning)
-}
-
-type NgrokGroupBox struct {
-	widgets.QGroupBox
-
-	clientIdLabel     *widgets.QLabel
-	clientIdLineInput *widgets.QLineEdit
-	startButton       *widgets.QPushButton
-	stopButton        *widgets.QPushButton
-
-	layout *widgets.QGridLayout
-
-	_ func(string) `signal:"sendLog"`
 }
 
 type ProxyAppWidget struct {

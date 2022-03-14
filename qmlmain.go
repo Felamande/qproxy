@@ -45,7 +45,7 @@ func QmlMain() {
 	app.RootContext().SetContextProperty("VerGetter", NewVerGetter(nil))
 
 	if debug {
-		if f, err := os.Stat(debugQmlFile); f == nil || err != nil {
+		if _, err := os.Stat(debugQmlFile); os.IsNotExist(err) {
 			app.Load(core.NewQUrl3("qrc:/qml/view.qml", 0))
 		} else {
 			app.Load(core.QUrl_FromLocalFile(debugQmlFile))
