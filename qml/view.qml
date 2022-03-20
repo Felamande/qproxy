@@ -213,7 +213,7 @@ ApplicationWindow {
                     id:vmProxyPortTextField
                     Layout.fillWidth: true
                     validator: IntValidator {bottom: 1; top: 65535;}
-                    text:"60606"
+                    text:"23456"
                     selectByMouse : true
                 }
                 Button {

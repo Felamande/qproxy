@@ -38,6 +38,8 @@ func (v *VmProxyRoute) ReqStart() interface{} {
 		}
 	}
 
+	v.Logger.Infof("post form: %v", data)
+
 	err := Default().StartForward(data.Name)
 	if err != nil {
 		return map[string]interface{}{
@@ -47,6 +49,7 @@ func (v *VmProxyRoute) ReqStart() interface{} {
 	}
 
 	port := Default().GetPort(data.Name)
+	v.Logger.Infof("start success name=%v, port=%v", data.Name, port)
 
 	return map[string]interface{}{
 		"name":  data.Name,

@@ -41,13 +41,14 @@ func (s *VmProxyServer) start(port string) {
 	s.RunStatusChange(true)
 	ctx, cancel := context.WithCancel(context.Background())
 	s.logCancel = cancel
+	go s.receiveLogging(ctx)
+
 	go func(ctx context.Context) {
 		defer s.logCancel()
 		defer s.RunStatusChange(false)
 
 		s.t.Run(":" + port)
 	}(ctx)
-	go s.receiveLogging(ctx)
 }
 
 func (s *VmProxyServer) receiveLogging(ctx context.Context) {
