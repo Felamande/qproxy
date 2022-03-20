@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"github.com/Felamande/qproxy/socks5server"
+	"github.com/Felamande/qproxy/vmproxy"
+
 	"github.com/spf13/viper"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
@@ -40,6 +42,7 @@ func QmlMain() {
 	debugQmlFile := viper.GetString("qmldebug_file")
 
 	socks5server.Socks5Server_QmlRegisterType2("Socks5", 1, 0, "Socks5server")
+	vmproxy.VmProxyServer_QmlRegisterType2("VmProxy", 1, 0, "VmProxyServer")
 
 	var app = qml.NewQQmlApplicationEngine(nil)
 	app.RootContext().SetContextProperty("VerGetter", NewVerGetter(nil))

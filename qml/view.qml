@@ -41,6 +41,7 @@
 //Slightly edited the original code for a scrollable TextArea and Qt Quick 2 controls
 
 import Socks5 1.0
+import VmProxy 1.0
 import QtQuick 2.2
 import QtQuick.Controls 2.3
 import QtQuick.Layouts 1.3
@@ -51,10 +52,10 @@ ApplicationWindow {
     visible: true
     title: "代理"
     property int margin: 11
-    minimumWidth: 600
-    minimumHeight: 450
-    maximumWidth: 600
-    maximumHeight: 450
+    minimumWidth: 650
+    minimumHeight: 500
+    maximumWidth: 650
+    maximumHeight: 500
     footer:ToolBar{
         height:20
         RowLayout{
@@ -88,7 +89,7 @@ ApplicationWindow {
         id:appTray
         visible:true
         icon.source:"qrc:/qml/icon.ico"
-        tooltip:"qproxy:未运行"
+        tooltip:"qproxy"
         onActivated:function(reason){
             switch(reason){
                 case SystemTrayIcon.DoubleClick:
@@ -116,14 +117,7 @@ ApplicationWindow {
             startButton.enabled = !isRunning
             stopButton.enabled =  isRunning
             portTextField.enabled = !isRunning
-            var tip = ""
-            if(isRunning){
-                tip = "运行中"
-            }else{
-                tip = "未运行"
-            }
-                
-            appTray.tooltip = "qproxy:"+tip
+
         }
         onReceiveRunningError:function(msg){
             outputEditWithTime(String(msg))
@@ -134,12 +128,23 @@ ApplicationWindow {
         }
     }
 
+    VmProxyServer {
+        id:appVmProxyServer
+        onRunStatusChange:function(isRunning){
+            vmProxyStartButton.enabled = !isRunning
+            vmProxyPortTextField.enabled = !isRunning
+        }
+        onReceiveLog:function(msg){
+            outputEditWithTime(String(msg))
+        }
+    }
+
     ColumnLayout {
         id: mainLayout
         anchors.fill: parent
         anchors.margins: margin
         GroupBox {
-            id: rowBox
+            id: socks5Box
             title: "socks5代理"
             Layout.fillWidth: true
 
@@ -160,7 +165,6 @@ ApplicationWindow {
                     validator: IntValidator {bottom: 1; top: 65535;}
                     text:"33899"
                     selectByMouse : true
-
                 }
                 Button {
                     id: startButton
@@ -189,6 +193,52 @@ ApplicationWindow {
                 }
             }
         }
+         GroupBox {
+            id: vmProxyBox
+            title: "VmProxy"
+            Layout.fillWidth: true
+
+            RowLayout {
+                id: vmProxyRowLayout
+                anchors.fill: parent
+                Label {
+                    id: vmProxyTitleLabel
+                    elide: Label.ElideRight
+                    horizontalAlignment: Qt.AlignHCenter
+                    verticalAlignment: Qt.AlignVCenter
+                    Layout.fillWidth: true
+                    text:"端口:"
+                }
+                TextField {
+                    id:vmProxyPortTextField
+                    Layout.fillWidth: true
+                    validator: IntValidator {bottom: 1; top: 65535;}
+                    text:"60606"
+                    selectByMouse : true
+                }
+                Button {
+                    id: vmProxyStartButton
+                    text: "开始"
+                    onClicked:function(clicked){
+                        try{
+                            outputEditWithTime("user start vmproxy server:port="+vmProxyPortTextField.text)
+                            appVmProxyServer.start(vmProxyPortTextField.text)
+                        }catch(e){
+                            outputEdit.append(String(e))
+                        }
+                    }
+                }
+                Button {
+                    id: vmProxyStopButton
+                    text: "结束"
+                    enabled:false
+                    onClicked:function(bool){
+                        
+                    }
+                }
+            }
+        }
+        
         GroupBox {
             id: outputBox
             title: "输出"
