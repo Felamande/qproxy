@@ -60,7 +60,7 @@ func (v *VmProxyManager) UpdateVms(vms []VmInfo) error {
 	defer v.updateLock.Unlock()
 
 	v.diff(vms,
-		func(vi VmInfo) error {
+		func(vi VmInfo) error { //delete
 			err := v.vmFwdMap[vi.Name].fwd.Stop()
 			delete(v.vmFwdMap, vi.Name)
 			if err != nil {
@@ -68,7 +68,7 @@ func (v *VmProxyManager) UpdateVms(vms []VmInfo) error {
 			}
 			return nil
 		},
-		func(vi VmInfo) error {
+		func(vi VmInfo) error { //update
 			old := v.vmFwdMap[vi.Name]
 			if old.vi.IP == vi.IP {
 				return nil
@@ -85,7 +85,7 @@ func (v *VmProxyManager) UpdateVms(vms []VmInfo) error {
 
 			return nil
 		},
-		func(vi VmInfo) error {
+		func(vi VmInfo) error { //add
 			v.vmFwdMap[vi.Name] = &VmFwdInfo{
 				vi: &VmInfo{
 					IP:   vi.IP,
@@ -107,7 +107,7 @@ func (v *VmProxyManager) StartForward(name string) error {
 
 	fwdInfo, exist := v.vmFwdMap[name]
 	if !exist {
-		return fmt.Errorf("cannot find vm name:", name)
+		return fmt.Errorf("cannot find vm name:%v", name)
 	}
 
 	if fwdInfo.fwd == nil {
