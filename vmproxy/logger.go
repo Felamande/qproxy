@@ -19,7 +19,7 @@ func (t *tangoChanLogger) Debugf(format string, v ...interface{}) {
 }
 func (t *tangoChanLogger) Debug(v ...interface{}) {
 	go func() {
-		t.logChan <- fmt.Errorf("[debug]" + fmt.Sprint(v...))
+		t.logChan <- fmt.Errorf("[debug]" + sprint(v...))
 	}()
 }
 func (t *tangoChanLogger) Infof(format string, v ...interface{}) {
@@ -29,7 +29,7 @@ func (t *tangoChanLogger) Infof(format string, v ...interface{}) {
 }
 func (t *tangoChanLogger) Info(v ...interface{}) {
 	go func() {
-		t.logChan <- fmt.Errorf("[info]" + fmt.Sprint(v...))
+		t.logChan <- fmt.Errorf("[info]" + sprint(v...))
 	}()
 }
 func (t *tangoChanLogger) Warnf(format string, v ...interface{}) {
@@ -39,7 +39,7 @@ func (t *tangoChanLogger) Warnf(format string, v ...interface{}) {
 }
 func (t *tangoChanLogger) Warn(v ...interface{}) {
 	go func() {
-		t.logChan <- fmt.Errorf("[warn]" + fmt.Sprint(v...))
+		t.logChan <- fmt.Errorf("[warn]" + sprint(v...))
 	}()
 }
 func (t *tangoChanLogger) Errorf(format string, v ...interface{}) {
@@ -49,6 +49,22 @@ func (t *tangoChanLogger) Errorf(format string, v ...interface{}) {
 }
 func (t *tangoChanLogger) Error(v ...interface{}) {
 	go func() {
-		t.logChan <- fmt.Errorf("[error]" + fmt.Sprint(v...))
+		t.logChan <- fmt.Errorf("[error]" + sprint(v...))
 	}()
+}
+
+func sprint(a ...interface{}) string {
+	ret := ""
+	for _, vi := range a {
+		switch v := vi.(type) {
+		case string:
+			ret = ret + v
+		case fmt.Stringer:
+			ret = ret + v.String()
+		default:
+			ret = ret + fmt.Sprint(v)
+		}
+		ret = ret + " "
+	}
+	return ret
 }
