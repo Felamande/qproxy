@@ -115,7 +115,22 @@ func (v *VmProxyManager) StartForward(name string) error {
 	}
 
 	if fwdInfo.fwd.IsRunning() {
+		go func() {
+			v.logChan <- fmt.Errorf("vmProxyManager use exist forward to %s:%s", fwdInfo.vi.IP, globalConstRdpPort)
+		}()
 		return nil
+	}
+
+	go func() {
+		v.logChan <- fmt.Errorf("vmProxyManager open new forward to %s:%s", fwdInfo.vi.IP, globalConstRdpPort)
+	}()
+
+	if fwdInfo.vi.IP == "" {
+		invalidIpErr := fmt.Errorf("the vm has no valid ip, maybe not started:name=%s", name)
+		go func() {
+			v.logChan <- invalidIpErr
+		}()
+		return invalidIpErr
 	}
 
 	return fwdInfo.fwd.Start(fwdInfo.vi.IP, globalConstRdpPort)

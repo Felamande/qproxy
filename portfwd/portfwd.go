@@ -46,6 +46,10 @@ func (f *PortForwarder) Start(fwdToIp, fwdToPort string) error {
 	f.fwdToIp = fwdToIp
 	f.fwdToPort = fwdToPort
 
+	go func() {
+		f.logChan <- fmt.Errorf("portforwarder start forward from 0.0.0.0:%v to %s:%s", localPort, fwdToIp, fwdToPort)
+	}()
+
 	go func(f *PortForwarder, ctx context.Context) {
 		defer f.updateStatus(false)
 
