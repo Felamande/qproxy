@@ -61,11 +61,18 @@ func (v *VmProxyManager) UpdateVms(vms []VmInfo) error {
 
 	v.diff(vms,
 		func(vi VmInfo) error { //delete
-			err := v.vmFwdMap[vi.Name].fwd.Stop()
-			delete(v.vmFwdMap, vi.Name)
-			if err != nil {
-				return err
+			var err error
+			old, exist := v.vmFwdMap[vi.Name]
+			if exist {
+				if old.fwd.IsRunning() {
+					err = old.fwd.Stop()
+				}
+				delete(v.vmFwdMap, vi.Name)
+				if err != nil {
+					return err
+				}
 			}
+
 			return nil
 		},
 		func(vi VmInfo) error { //update
@@ -76,7 +83,10 @@ func (v *VmProxyManager) UpdateVms(vms []VmInfo) error {
 
 			old.vi.IP = vi.IP
 			if old.fwd != nil {
-				err := old.fwd.Stop()
+				var err error
+				if old.fwd.IsRunning() {
+					err = old.fwd.Stop()
+				}
 				old.fwd = portfwd.NewPortForwarder(v.logChan)
 				old.FwdStatus = false
 

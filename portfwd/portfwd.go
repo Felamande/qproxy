@@ -27,6 +27,7 @@ func (f *PortForwarder) Info() (listenPort int, fwdToIp, fwdToPort string) {
 func NewPortForwarder(logChan chan error) *PortForwarder {
 	return &PortForwarder{
 		logChan: logChan,
+		status:  false,
 	}
 }
 
