@@ -21,7 +21,6 @@ func GetVMAdapters() (m []VmInfo) {
 
 		if len(ret.Objects) >= 1 {
 			ip := ret.Objects[0].ToString()
-			ret.Objects[0].IsNull()
 			if ret.Objects[0].IsNull() {
 				ip = ""
 			}
